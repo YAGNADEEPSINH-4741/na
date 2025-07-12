@@ -2,8 +2,8 @@
  * Google API utilities for Drive integration
  */
 
-const CLIENT_ID = "850316948462-o5aip3c43p343l4aksg3fn02pcjcqqaa.apps.googleusercontent.com";
-const API_KEY = "AIzaSyBzTH1f_pjyoGLKA9GM2J9Y5VPg0K33nVQ";
+const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
 export interface GoogleApiState {
@@ -35,6 +35,11 @@ export class GoogleApiManager {
 
   private async doInitialize(): Promise<void> {
     try {
+      // Check if credentials are available
+      if (!CLIENT_ID || !API_KEY) {
+        throw new Error('Google API credentials not configured. Please set NEXT_PUBLIC_GOOGLE_CLIENT_ID and NEXT_PUBLIC_GOOGLE_API_KEY in your .env.local file.');
+      }
+
       // Wait for scripts to be available
       await this.waitForScripts();
       
