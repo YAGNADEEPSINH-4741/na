@@ -13,10 +13,15 @@ export function useNews() {
     try {
       const items = window.localStorage.getItem(STORAGE_KEY);
       if (items) {
-        setArticles(JSON.parse(items));
+        const parsedArticles = JSON.parse(items);
+        // Sort articles by creation date (newest first)
+        const sortedArticles = parsedArticles.sort((a: NewsArticle, b: NewsArticle) => b.createdAt - a.createdAt);
+        setArticles(sortedArticles);
       }
     } catch (error) {
       console.error("Failed to load news articles from localStorage", error);
+      // Clear corrupted data
+      window.localStorage.removeItem(STORAGE_KEY);
     } finally {
       setLoading(false);
     }
@@ -24,12 +29,12 @@ export function useNews() {
 
   const addArticle = useCallback((newArticle: NewsArticle) => {
     setArticles(prevArticles => {
-      const updatedArticles = [newArticle, ...prevArticles];
+      // Ensure articles are sorted by creation date
+      const updatedArticles = [newArticle, ...prevArticles].sort((a, b) => b.createdAt - a.createdAt);
       try {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedArticles));
       } catch (error) {
         console.error("Failed to save news article to localStorage", error);
-        // Revert state if save fails by returning previous articles
         return prevArticles;
       }
       return updatedArticles;

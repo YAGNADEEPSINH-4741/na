@@ -27,10 +27,13 @@ export default function NewsFeed() {
 
   if (articles.length === 0) {
     return (
-      <div className="text-center py-20 bg-card/50 rounded-lg border border-dashed">
+      <div className="text-center py-20 bg-card/50 rounded-lg border border-dashed border-border/50">
         <Newspaper className="mx-auto h-12 w-12 text-muted-foreground" />
         <h2 className="mt-6 text-2xl font-headline font-semibold">No News Published Yet</h2>
-        <p className="text-muted-foreground mt-2">Go to the admin panel to publish the first article!</p>
+        <p className="text-muted-foreground mt-2 max-w-md mx-auto">
+          Head over to the admin panel to create and publish your first news article. 
+          Articles will appear here once published.
+        </p>
       </div>
     );
   }

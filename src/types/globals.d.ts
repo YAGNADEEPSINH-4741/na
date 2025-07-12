@@ -1,17 +1,10 @@
 declare global {
-  const gapi: any;
-  const html2pdf: any;
   interface Window {
-    gapiOnLoad?: () => void;
-    gsiOnLoad?: () => void;
+    gapi: any;
+    google: any;
   }
-  namespace google {
-    namespace accounts {
-      namespace oauth2 {
-        function initTokenClient(config: any): any;
-      }
-    }
-  }
+  
+  const html2pdf: any;
 }
 
 export {};
