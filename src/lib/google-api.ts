@@ -88,13 +88,27 @@ export class GoogleApiManager {
             apiKey: API_KEY,
             discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
           });
+          
+          // Load the Drive API explicitly as a fallback
+          await window.gapi.client.load('drive', 'v3');
+          
           resolve();
         } catch (error) {
           console.error('GAPI client initialization error details:', error);
-          if (error instanceof Error) {
-            reject(new Error(`Failed to initialize GAPI client: ${error.message}`));
-          } else {
-            reject(new Error(`Failed to initialize GAPI client: ${JSON.stringify(error)}`));
+          
+          // Try alternative initialization without discovery docs
+          try {
+            await window.gapi.client.init({
+              apiKey: API_KEY,
+            });
+            await window.gapi.client.load('drive', 'v3');
+            resolve();
+          } catch (fallbackError) {
+            if (error instanceof Error) {
+              reject(new Error(`Failed to initialize GAPI client: ${error.message}`));
+            } else {
+              reject(new Error(`Failed to initialize GAPI client: ${JSON.stringify(error)}`));
+            }
           }
         }
       });
