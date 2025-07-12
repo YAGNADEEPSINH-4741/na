@@ -90,7 +90,12 @@ export class GoogleApiManager {
           });
           resolve();
         } catch (error) {
-          reject(new Error('Failed to initialize GAPI client'));
+          console.error('GAPI client initialization error details:', error);
+          if (error instanceof Error) {
+            reject(new Error(`Failed to initialize GAPI client: ${error.message}`));
+          } else {
+            reject(new Error(`Failed to initialize GAPI client: ${JSON.stringify(error)}`));
+          }
         }
       });
     });
