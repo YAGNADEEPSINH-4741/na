@@ -55,15 +55,6 @@ export default function AdminPanel() {
   });
   
   const gapiLoaded = useCallback(() => {
-    if (!window.gapi) {
-      console.error("GAPI script loaded but window.gapi not defined.");
-      toast({
-        variant: "destructive",
-        title: "Google API Error",
-        description: "GAPI client failed to load. Please refresh and try again.",
-      });
-      return;
-    }
     window.gapi.load('client', async () => {
       try {
         await window.gapi.client.init({
@@ -84,9 +75,6 @@ export default function AdminPanel() {
 
   const gsiLoaded = useCallback(() => {
     try {
-      if (!window.google?.accounts?.oauth2) {
-        throw new Error("Google Identity Services not available.");
-      }
       const client = window.google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
@@ -118,43 +106,16 @@ export default function AdminPanel() {
   }, [toast]);
 
   useEffect(() => {
-    const loadScript = (src: string, id: string, onLoad: () => void, onError: () => void) => {
-      if (document.getElementById(id)) {
-        onLoad();
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = src;
-      script.id = id;
-      script.async = true;
-      script.defer = true;
-      script.onload = onLoad;
-      script.onerror = onError;
-      document.body.appendChild(script);
+    // Set up global callback functions for Google API scripts
+    window.gapiOnLoad = gapiLoaded;
+    window.gsiOnLoad = gsiLoaded;
+
+    // Cleanup function to remove global callbacks
+    return () => {
+      delete window.gapiOnLoad;
+      delete window.gsiOnLoad;
     };
-
-    const handleGapiError = () => {
-        console.error("Failed to load the Google API script.");
-        toast({
-          variant: "destructive",
-          title: "Network Error",
-          description: "Could not load necessary Google scripts. Please check your connection and try again.",
-        });
-    };
-
-    const handleGsiError = () => {
-        console.error("Failed to load the Google Sign-In script.");
-        toast({
-          variant: "destructive",
-          title: "Network Error",
-          description: "Could not load necessary Google Sign-In scripts. Please check your connection and try again.",
-        });
-    };
-
-    loadScript('https://accounts.google.com/gsi/client', 'google-gsi-script', gsiLoaded, handleGsiError);
-    loadScript('https://apis.google.com/js/api.js', 'google-api-script', gapiLoaded, handleGapiError);
-
-  }, [gsiLoaded, gapiLoaded, toast]);
+  }, [gapiLoaded, gsiLoaded]);
 
 
   useEffect(() => {
